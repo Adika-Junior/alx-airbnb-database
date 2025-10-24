@@ -10,9 +10,9 @@ This folder contains SQL scripts to populate the AirBnB database with realistic 
    - Extensions: pgcrypto, cube, earthdistance
 
 2. Run the seed script:
-   ```bash
-   psql -d your_database -f seed.sql
-   ```
+```bash
+psql -d your_database -f seed.sql
+```
 
 ## Sample Data Overview
 
@@ -42,10 +42,10 @@ The seed script populates:
 Check data integrity:
 ```sql
 -- Count active properties by city
-SELECT l.city, COUNT(*) 
+SELECT l.city, COUNT(*)
 FROM property p
 JOIN location l ON p.location_id = l.location_id
-WHERE p.deleted_at IS NULL 
+WHERE p.deleted_at IS NULL
 GROUP BY l.city;
 
 -- Verify booking constraints
@@ -60,19 +60,7 @@ SELECT r.rating, p.name, b.status
 FROM review r
 JOIN booking b ON r.booking_id = b.booking_id
 JOIN property p ON r.property_id = p.property_id;
-
-## Sample Data Overview
-
-The seed data creates a realistic mini-ecosystem:
-
-- 10 users (5 hosts, 5 guests)
-- 15 properties across different cities
-- 30+ amenities across categories
-- 3 months of availability calendar data
-- 20 bookings in various states
-- 30 payments (some bookings have partial payments)
-- 15 reviews with detailed ratings
-- 25 message threads
+```
 
 ## Running the Scripts
 
@@ -115,7 +103,7 @@ The sample data demonstrates:
 
 ## Test Queries
 
-The README includes example queries to verify the loaded data:
+Example queries to verify the loaded data:
 
 ```sql
 -- Find all properties for a host
@@ -165,4 +153,3 @@ After loading the sample data, you can:
 3. Add reviews to verify booking-review linkage
 4. Test the availability calendar features
 
-For more complex test scenarios, see the test harness in `../database-script-0x01/seed_and_tests.sql`.

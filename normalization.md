@@ -1,5 +1,4 @@
-
-Database Normalization Analysis - AirBnB Clone
+# Database Normalization Analysis - AirBnB Clone
 Table of Contents
 
 Current Entity Analysis
@@ -34,7 +33,7 @@ user_id, email, full_name, phone, created_at
 ### 2. Property Entity
 **Current Structure:**
 ```
-property_id, host_id, name, description, location, 
+property_id, host_id, name, description, location,
 price_per_night, created_at
 ```
 
@@ -60,7 +59,7 @@ price_per_night, created_at
 ### 3. Booking Entity
 **Current Structure:**
 ```
-booking_id, property_id, user_id, start_date, end_date, 
+booking_id, property_id, user_id, start_date, end_date,
 total_price, status
 ```
 
@@ -153,7 +152,9 @@ message_id, sender_id, recipient_id, message_body, sent_at
 
 ### What is Database Normalization?
 
-Database normalization is a systematic process of organizing data in a database to reduce redundancy and improve data integrity. It involves decomposing tables into smaller, well-structured tables and defining relationships between them according to specific rules called normal forms.
+Database normalization is a systematic process of organizing data in a database to reduce redundancy and
+improve data integrity. It involves decomposing tables into smaller, well-structured tables and
+defining relationships between them according to specific rules called normal forms.
 
 ### Why Normalize?
 
@@ -314,7 +315,7 @@ property(property_id, host_id, name, description, location, price_per_night, cre
 **Solution**: Extract location components
 ```
 property(
-	property_id, host_id, name, description, 
+	property_id, host_id, name, description,
 	street, city, state, country, postal_code,
 	price_per_night, created_at
 )
@@ -385,7 +386,8 @@ property(
 **Missing Entity**: Amenities are not represented in the original schema
 
 #### Analysis
-Properties have multiple amenities (WiFi, Kitchen, Pool, etc.), and the same amenity applies to multiple properties. This is a many-to-many relationship requiring normalization.
+Properties have multiple amenities (WiFi, Kitchen, Pool, etc.), and the same amenity applies to
+multiple properties. This is a many-to-many relationship requiring normalization.
 
 #### 1NF Analysis
 If amenities were stored as a comma-separated list:
@@ -423,7 +425,8 @@ property_amenity(
 **Missing Entity**: Availability and dynamic pricing not represented
 
 #### Analysis
-Properties need per-date availability tracking and price overrides for weekends/holidays. This requires a separate entity to avoid data redundancy and support fine-grained control.
+Properties need per-date availability tracking and price overrides for weekends and holidays.
+This requires a separate entity to avoid data redundancy and to support fine-grained control.
 
 #### Normalization Rationale
 - Each property has availability status for each date
@@ -864,7 +867,8 @@ booking(
 	end_date             DATE,
 	num_guests           INTEGER,
 	total_price          NUMERIC(10,2),
-	status               VARCHAR(20),  -- 'pending', 'confirmed', 'checked_in', 'checked_out', 'completed', 'canceled', 'refunded'
+	status               VARCHAR(20),  -- 'pending', 'confirmed', 'checked_in', 'checked_out',
+									   -- 'completed', 'canceled', 'refunded'
 	special_requests     TEXT,
 	checked_in_at        TIMESTAMPTZ,
 	checked_out_at       TIMESTAMPTZ,
@@ -1021,7 +1025,8 @@ Booking (1) ──────< (many) Message [optional booking context]
 ### Second Normal Form (2NF) ✓
 - [x] All tables use surrogate primary keys (UUID)
 - [x] No partial dependencies on composite keys
-- [x] Property_Amenity: Composite key (property_id, amenity_id) with no non-key attributes to create partial dependencies
+ - [x] Property_Amenity: Composite key (property_id, amenity_id) with no non-key attributes
+	that would create partial dependencies
 - [x] Property_Availability: Composite unique key (property_id, available_date) properly structured
 
 ### Third Normal Form (3NF) ✓
@@ -1218,7 +1223,7 @@ CREATE UNIQUE INDEX idx_no_double_booking ON booking(property_id, start_date, en
 
 -- Availability queries
 CREATE INDEX idx_availability_property_date ON property_availability(property_id, available_date);
-CREATE INDEX idx_availability_date_range ON property_availability(available_date) 
+CREATE INDEX idx_availability_date_range ON property_availability(available_date)
 	WHERE is_available = true;
 
 -- Property search
@@ -1235,7 +1240,7 @@ CREATE INDEX idx_review_property ON review(property_id) WHERE deleted_at IS NULL
 CREATE INDEX idx_review_rating ON review(rating) WHERE deleted_at IS NULL;
 
 -- Unread messages
-CREATE INDEX idx_message_unread ON message(recipient_id, is_read) 
+CREATE INDEX idx_message_unread ON message(recipient_id, is_read)
 	WHERE deleted_at IS NULL AND is_read = false;
 ```
 
@@ -1329,29 +1334,41 @@ property_amenity(property_id, amenity_id) PRIMARY KEY
 
 ---
 
+
 ## Conclusion
 
-This normalization analysis has successfully transformed the AirBnB clone database from its original unnormalized state to a fully normalized Third Normal Form (3NF) structure. The key achievements include:
+This normalization analysis has successfully transformed the AirBnB clone database from its original,
+unnormalized state into a fully normalized Third Normal Form (3NF) structure. The key achievements are
+summarized below.
 
-1. **1NF Compliance**: All attributes are atomic, with composite fields like `full_name` and `location` properly decomposed.
+1. **1NF Compliance**: All attributes are atomic. Composite fields such as `full_name` and `location`
+	have been decomposed into their component columns.
 
-2. **2NF Compliance**: Partial dependencies eliminated through the use of surrogate primary keys and proper junction tables for many-to-many relationships.
+2. **2NF Compliance**: Partial dependencies were removed by introducing surrogate primary keys and
+	proper junction tables for many-to-many relationships.
 
-3. **3NF Compliance**: Transitive dependencies removed by extracting `location` as an independent entity and normalizing amenity management.
+3. **3NF Compliance**: Transitive dependencies were removed by extracting `location` as an independent
+	entity and by normalizing amenity management.
 
-4. **Enhanced Data Integrity**: Addition of comprehensive CHECK constraints, foreign key relationships, and business rule enforcement at the database level.
+4. **Enhanced Data Integrity**: Comprehensive CHECK constraints, foreign keys, and other database-level
+	enforcement mechanisms were added to enforce business rules.
 
-5. **Improved Maintainability**: Soft delete pattern, audit trails, and independent entity management enable safer operations and historical tracking.
+5. **Improved Maintainability**: Soft-delete patterns, audit trails, and independent entity management
+	enable safer operations and make backfills and migrations easier.
 
-6. **Better Performance**: Strategic indexing, including partial indexes for active records and spatial indexes for geographic queries.
+6. **Better Performance**: Strategic indexing (including partial indexes for active records and spatial
+	indexes for geo queries) was planned to keep common queries performant.
 
-7. **Business Logic Support**: Database-level enforcement of critical rules like double booking prevention, payment flexibility, and review verification.
+7. **Business Logic Support**: The schema enforces critical rules such as double-booking prevention,
+	payment flexibility, and review verification at the database level.
 
-The normalized schema provides a solid foundation for a scalable, maintainable, and reliable booking platform that enforces data integrity while remaining flexible for future enhancements.
+The normalized schema provides a solid foundation for a scalable, maintainable, and reliable booking
+platform that enforces data integrity while remaining flexible for future enhancements.
 
 ---
 
-**Document Version**: 1.0  
-**Last Updated**: 2025-01-24  
-**Normalization Level**: Third Normal Form (3NF)  
-**Total Entities**: 10 (User, Location, Property, Property_Availability, Amenity, Property_Amenity, Booking, Payment, Review, Message)
+**Document Version**: 1.0
+**Last Updated**: 2025-01-24
+**Normalization Level**: Third Normal Form (3NF)
+**Total Entities**: 10 (User, Location, Property, Property_Availability,
+Amenity, Property_Amenity, Booking, Payment, Review, Message)

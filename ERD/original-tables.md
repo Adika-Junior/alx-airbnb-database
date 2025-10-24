@@ -1,3 +1,24 @@
+# Original (Unnormalized) Tables
+
+This file captures the original, pre-normalization table specification used as the starting point for
+the 3NF analysis. It is intentionally simple and contains some composite or repeated fields that were
+later decomposed in `normalization.md`.
+
+Below is the original specification (kept as a reference so migrations can be planned):
+
+```text
+
+Notes:
+- This original model was intentionally straightforward to capture functional requirements quickly.
+- Fields such as `full_name` and `location` are composite and were split into atomic columns in the normalized design.
+- Use this file when drafting migration queries to map old columns to the new normalized tables.
+---
+
+## 2. `ERD/original-tables.md`
+
+This file details the initial, unnormalized specification before the 3NF analysis.
+
+```markdown
 Database Specification - AirBnB
 Entities and Attributes
 User
@@ -46,26 +67,3 @@ sender_id: Foreign Key, references User(user_id)
 recipient_id: Foreign Key, references User(user_id)
 message_body: TEXT, NOT NULL
 sent_at: TIMESTAMP, DEFAULT CURRENT_TIMESTAMP
-Constraints
-User Table
-Unique constraint on email.
-Non-null constraints on required fields.
-Property Table
-Foreign key constraint on host_id.
-Non-null constraints on essential attributes.
-Booking Table
-Foreign key constraints on property_id and user_id.
-status must be one of pending, confirmed, or canceled.
-Payment Table
-Foreign key constraint on booking_id, ensuring payment is linked to valid bookings.
-Review Table
-Constraints on rating values (1-5).
-Foreign key constraints on property_id and user_id.
-Message Table
-Foreign key constraints on sender_id and recipient_id.
-Indexing
-Primary Keys: Indexed automatically.
-Additional Indexes:
-email in the User table.
-property_id in the Property and Booking tables.
-booking_id in the Booking and Payment tables.
