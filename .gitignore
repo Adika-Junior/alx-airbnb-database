@@ -1,0 +1,12 @@
+# Ignore everything except README.md files
+# This allows README.md files to be tracked while keeping other files local only
+
+# Ignore all files
+*
+
+# But don't ignore README.md files
+!README.md
+!**/README.md
+
+# Don't ignore .gitignore itself
+!.gitignore
